@@ -4,9 +4,11 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
@@ -21,6 +23,7 @@ public class FlipKartHome
 	WebDriver driver;
 	Robot r;
 	WebElement search;
+	Timeouts implicitlyWait;
 	
 	@Given("Open flipkart page and disable the popup")
 	public void open_flipkart_page_and_disable_the_popup() throws AWTException 
@@ -29,6 +32,8 @@ public class FlipKartHome
 		driver = new ChromeDriver();
 		driver.get("https://www.flipkart.com/");
 		driver.manage().window().maximize();
+		implicitlyWait = driver.manage().timeouts();//implicitlyWait(10, TimeUnit.SECONDS);
+		implicitlyWait.implicitlyWait(10, TimeUnit.SECONDS);
 		//driver.manage().timeouts().implicitlyWait(7, TimeUnit.SECONDS);
 		r = new Robot();
 		driver.findElement(By.xpath("//button[@class='_2AkmmA _29YdH8']")).click();
@@ -36,8 +41,9 @@ public class FlipKartHome
 	}
 	
 	@When("Search mobiles in the search bar")
-	public void search_mobiles_in_the_search_bar() 
+	public void search_mobiles_in_the_search_bar() throws InterruptedException 
 	{
+		implicitlyWait.implicitlyWait(10, TimeUnit.SECONDS);
 		search = driver.findElement(By.xpath("//input[@class='LM6RPg']"));
 		System.out.println(search.getLocation());
 		System.out.println(search.isDisplayed());
@@ -56,13 +62,27 @@ public class FlipKartHome
 		r.keyRelease(KeyEvent.VK_E);
 		r.keyPress(KeyEvent.VK_S);
 		r.keyRelease(KeyEvent.VK_S);
+//		r.keyPress(KeyEvent.VK_ENTER);
+//		r.keyRelease(KeyEvent.VK_ENTER);
+		Thread.sleep(5000);
+		for (int i = 0; i < 10; i++) 
+		{
+			r.keyPress(KeyEvent.VK_DOWN);
+			r.keyRelease(KeyEvent.VK_DOWN);
+			Thread.sleep(5000);
+			WebElement value = driver.findElement(By.xpath("//input[@type='text' and @title='Search for products, brands and more'] "));
+			System.out.println(value.getAttribute("value"));
+			
+		}
 		r.keyPress(KeyEvent.VK_ENTER);
 		r.keyRelease(KeyEvent.VK_ENTER);
+
 	}
 	
 	@Then("print all the Web Element")
 	public void print_all_the_Web_Element() throws InterruptedException 
 	{
+		implicitlyWait.implicitlyWait(10, TimeUnit.SECONDS);
 		Thread.sleep(5000);
 		List<WebElement> elements = driver.findElements(By.xpath("//div[@class='_3wU53n']"));
 		
